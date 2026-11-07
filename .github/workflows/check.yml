@@ -1,0 +1,28 @@
+---
+# Feedback only: FAIL items never fail the run, an import error does.
+# No Hadoop cluster here: checks observations.py and setup.json only.
+name: check
+
+"on":
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run check.py
+        shell: bash
+        run: |
+          python3 --version
+          python3 check.py | tee check.log
+          {
+            echo '```'
+            grep -E '^(setup|in class|at home):' check.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
